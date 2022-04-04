@@ -64,4 +64,18 @@ class ClassComponents extends PureComponents {
   }
 }
 
+function FunctionComponent() {
+  let [number, setNumber] = React.useState(0);
+  let handleClick = () => {
+    setTimeout(() => console.log(number), 3000);
+    setNumber(number + 1);
+  };
+  return (
+    <div>
+      <p>{number}</p>
+      <button onClick={handleClick}>+</button>
+    </div>
+  );
+}
+
 ReactDom.render(<ClassComponents />, document.getElementById("root"));
