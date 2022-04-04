@@ -1,5 +1,4 @@
 import React from "react";
-import ReactDom from "react-dom";
 // import React from "./react";
 // const { createElement, Component } = React;
 
@@ -7,7 +6,6 @@ console.log("React", React);
 
 class PureComponents extends React.Component {
   shouldComponentUpdate(nextProps, nextState) {
-    console.log("nextProps", nextProps, nextState);
     return (
       shallowEqual(nextProps, this.props) && shallowEqual(nextState, this.state)
     );
@@ -47,21 +45,57 @@ function shallowEqual(object1, object2) {
   return true;
 }
 
-class ClassComponents extends PureComponents {
-  state = { number: 0 };
-  handleClick = () => {
-    setTimeout(() => console.log(this.state.number), 1000); //1
-    this.setState({ number: this.state.number + 1 });
-  };
+let virtualDOM = (
+  <div id="A1" key="A1">
+    <div id="B1" key="B1">
+      B1
+    </div>
+    <div id="B2" key="B2">
+      B2
+    </div>
+  </div>
+);
+console.log("virtualDOM", virtualDOM);
 
+const createElementData = createElement(
+  "div",
+  {
+    id: "A1",
+    key: "A1",
+  },
+  createElement(
+    "span",
+    {
+      id: "B1",
+      key: "B1",
+    },
+    "B1"
+  ),
+  createElement(
+    "div",
+    {
+      id: "B2",
+      key: "B2",
+    },
+    "B2"
+  )
+);
+console.log("createElementData", createElementData);
+
+function FunctionComponents() {
+  return virtualDOM;
+}
+
+let functionVirtualDom = <FunctionComponents />;
+
+console.log("functionVirtualDom", functionVirtualDom);
+
+class ClassComponents extends Component {
   render() {
-    return (
-      <div>
-        <p>{this.state.number}</p>
-        <button onClick={this.handleClick}>+</button>
-      </div>
-    );
+    return virtualDOM;
   }
 }
 
-ReactDom.render(<ClassComponents />, document.getElementById("root"));
+const classVirtualDom = <ClassComponents />;
+
+console.log("classVirtualDom", classVirtualDom);
