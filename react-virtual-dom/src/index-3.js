@@ -19,3 +19,4 @@ class App extends React.Component {
 }
 let root = document.getElementById("root");
 ReactDOM.render(<App />, root);
+// ReactDOM.unstable_createRoot(root).render(<App />);
