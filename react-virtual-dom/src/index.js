@@ -11,7 +11,14 @@ let virtualDom = {
         key: "B",
         props: {
           style: style,
-          children: 'B1 文本',
+          children: [
+            {
+              type: 'span',
+              key: 'b1',
+              props: 'B1 文本',
+            },
+            'B2 文本'
+          ]
         },
       },
       {
@@ -52,12 +59,14 @@ workLoop()
 
 function performUnitOfWork (fiber) {
   beginWork(fiber)
+  // console.log('f', fiber)
 
   if (fiber.child) {
     return fiber.child
   }
 
   while (fiber) {
+    completeUnitOfWork(fiber)
     if (fiber.sibling) {
       return fiber.sibling
     }
@@ -65,6 +74,36 @@ function performUnitOfWork (fiber) {
     fiber = fiber.return
   }
 }
+
+function completeUnitOfWork(workInProgress) {
+  // console.log('workInProgress', workInProgress.key)
+
+  let stateNode
+  switch (workInProgress.tag) {
+    case TAG_HOST:
+      stateNode = createStateNode(workInProgress)
+      break;
+    case TAG_TEXT:
+      createStateNode(workInProgress)
+      break;
+  }
+}
+
+function createStateNode(fiber) {
+  if (fiber.tag === TAG_TEXT) {
+    let stateNode = document.createTextNode(fiber.props)
+    fiber.stateNode = stateNode
+  } else if (fiber.tag === TAG_HOST) {
+    let stateNode = document.createElement(fiber.type)
+    if (typeof fiber.props.children === 'string') {
+      stateNode.appendChild(document.createTextNode(fiber.props.children))
+    }
+    fiber.stateNode = stateNode
+  }
+
+  return fiber.stateNode
+}
+
 
 function beginWork (fiber) {
   console.log('fiber', fiber, fiber.key);
