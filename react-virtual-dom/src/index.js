@@ -1,4 +1,4 @@
-let style = { border: '1px solid red', color: 'red', margin: '5px' };
+let style = { border: '1px solid red', color: 'red', margin: '10px', padding: '10px' };
 
 let virtualDom = {
   type: 'div',
@@ -7,27 +7,39 @@ let virtualDom = {
     style: style,
     children: [
       {
-        type: 'input',
-        key: "B",
+        type: 'div',
+        key: "A1",
+        style: style,
+        props: {
+          style: style,
+          children: 'A1 text',
+        },
+      },
+      {
+        type: 'div',
+        key: "A2",
         props: {
           style: style,
           children: [
             {
-              type: 'span',
-              key: 'b1',
-              props: 'B1 文本',
+              type: 'div',
+              key: "A21",
+              style: style,
+              props: {
+                style: style,
+                children: 'A21 text',
+              },
             },
-            'B2 文本'
+            {
+              type: 'div',
+              key: "A22",
+              props: {
+                style: style,
+                children: 'A22 text',
+              },
+            }
           ]
-        },
-      },
-      {
-        type: 'button',
-        key: "C",
-        props: {
-          style: style,
-          children: 'C1 按钮',
-        },
+        }
       }
     ]
   }
@@ -37,25 +49,33 @@ let workInProgress
 const TAG_ROOT = Symbol.for('TAG_ROOT');
 export const TAG_TEXT = Symbol.for('TAG_TEXT');
 export const TAG_HOST = Symbol.for('TAG_HOST');
+const Placement = 'Placement';
 
 function workLoop() {
   while (workInProgress) {
     workInProgress = performUnitOfWork(workInProgress)
   }
+  commitRoot(rootFiber)
 }
 
-let rootFiber = {
-  tag: TAG_ROOT,
-  key: "ROOT",
-  stateNode: document.getElementById('root'),
-  props: {
-    children: [virtualDom]
+function commitRoot(rootFiber) {
+  let currentEffect = rootFiber.firstEffect;
+  while (currentEffect) {
+    console.log('currentEffect', currentEffect.key)
+    let flags = currentEffect.flags
+    switch (flags) {
+      case Placement:
+        commitPlacement(currentEffect)
+        break;
+    }
+    currentEffect = currentEffect.nextEffect
   }
 }
 
-workInProgress = rootFiber;
-workLoop()
-
+function commitPlacement(currentFiber) {
+  let parent = currentFiber.return.stateNode
+  parent.appendChild(currentFiber.stateNode)
+}
 
 function performUnitOfWork (fiber) {
   beginWork(fiber)
@@ -70,10 +90,22 @@ function performUnitOfWork (fiber) {
     if (fiber.sibling) {
       return fiber.sibling
     }
-
     fiber = fiber.return
   }
 }
+
+let rootFiber = {
+  tag: TAG_ROOT,
+  key: "ROOT",
+  stateNode: document.getElementById('root'),
+  props: {
+    children: [virtualDom]
+  }
+}
+
+workInProgress = rootFiber;
+workLoop()
+console.log('rootFiber', rootFiber)
 
 function completeUnitOfWork(workInProgress) {
   // console.log('workInProgress', workInProgress.key)
@@ -82,10 +114,18 @@ function completeUnitOfWork(workInProgress) {
   switch (workInProgress.tag) {
     case TAG_HOST:
       stateNode = createStateNode(workInProgress)
+      setInitialProperties(stateNode, workInProgress.props)
       break;
     case TAG_TEXT:
       createStateNode(workInProgress)
       break;
+  }
+  markEffectList(workInProgress)
+}
+
+function setInitialProperties(node, props) {
+  for (let property in props.style) {
+    node.style[property] = props.style[property]
   }
 }
 
@@ -100,8 +140,33 @@ function createStateNode(fiber) {
     }
     fiber.stateNode = stateNode
   }
-
   return fiber.stateNode
+}
+
+function markEffectList (completedWork) {
+  const returnFiber = completedWork.return
+  if (returnFiber) {
+    if (!returnFiber.firstEffect) {
+      returnFiber.firstEffect = completedWork.firstEffect
+    }
+    if (completedWork.lastEffect) {
+      // console.log('completedWork', completedWork)
+      if (returnFiber.lastEffect) {
+        console.log('returnFiber.lastEffect', returnFiber.lastEffect.nextEffect, completedWork.firstEffect)
+        returnFiber.lastEffect.nextEffect = completedWork.firstEffect
+      }
+      returnFiber.lastEffect = completedWork.lastEffect
+      console.log('returnFiber.lastEffect222', returnFiber, completedWork)
+    }
+    if (completedWork.flags) {
+      if (returnFiber.lastEffect) {
+        returnFiber.lastEffect.nextEffect = completedWork
+      } else {
+        returnFiber.firstEffect = completedWork
+      }
+      returnFiber.lastEffect = completedWork
+    }
+  }
 }
 
 
@@ -129,6 +194,7 @@ function reconcileChildren(returnFiber, nextChildren) {
   for (let newIdx = 0; newIdx < newChildren.length; newIdx++) {
     const newFiber = createFiber(newChildren[newIdx])
     newFiber.return = returnFiber
+    newFiber.flags = Placement;
 
     if (!previousNewFiber) {
       firstChild = newFiber
