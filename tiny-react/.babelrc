@@ -1,0 +1,12 @@
+// config in webpack.config.js
+{
+    "presets": [
+        "@babel/preset-env",
+        [
+            "@babel/preset-react",
+            {
+                "pragma": "TinyReact.createElement"
+            }
+        ]
+    ]
+}
