@@ -48,25 +48,45 @@ const virtualDOM = (
     {props.title}
   </div>
 
-  TinyReact.render(virtualDOM, root)
-  setTimeout(() => {
-    TinyReact.render(modifyVirtualDOM, root)
-  }, 2000)
+  // TinyReact.render(virtualDOM, root)
+  // setTimeout(() => {
+  //   TinyReact.render(modifyVirtualDOM, root)
+  // }, 2000)
   // TinyReact.render(<Heart title="Hello React" />, root)
 
   class Alert extends TinyReact.Component {
     constructor(props) {
       super(props)
+      this.state = {
+        title: 'default title'
+      }
+
+      // 更改 handleChange 方法中的 this 指向 让 this 指向类实例对象
+      this.handleChange = this.handleChange.bind(this)
     }
+
+    handleChange () {
+      // 调用父类中的 setState 方法更改状态
+      console.log('handleChange', this.state)
+      this.setState({
+        title: 'changed title'
+      })
+    }
+
     render () {
+      console.log('this', this.state)
       return <div>
         {this.props.name}
         {this.props.age}
         <br />
         Hello Class Component
+        <br />
+        {this.props.title}
+        <br />
+        <button onClick={this.handleChange}>change</button>
       </div>
     }
   }
-  // TinyReact.render(<Alert name="zhangsan" age={18} />, root)
+  TinyReact.render(<Alert name="zhangsan" age={18} />, root)
 
   console.log(virtualDOM)
