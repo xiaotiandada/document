@@ -1,3 +1,5 @@
+import diff from "./diff"
+
 export default class Component {
   constructor(props) {
     this.props = props
@@ -17,6 +19,9 @@ export default class Component {
     let oldDOM = this.getDOM()
 
     console.log('oldDOM', oldDOM)
+
+    let container = oldDOM.parentNode
+    diff(virtualDOM, container, oldDOM)
   }
   // 保存 DOM 对象的方法
   setDOM(dom) {

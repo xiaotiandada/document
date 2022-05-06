@@ -69,7 +69,7 @@ const virtualDOM = (
       // 调用父类中的 setState 方法更改状态
       console.log('handleChange', this.state)
       this.setState({
-        title: 'changed title'
+        title: 'changed title' + ' ' + Date.now()
       })
     }
 
@@ -81,7 +81,7 @@ const virtualDOM = (
         <br />
         Hello Class Component
         <br />
-        {this.props.title}
+        {this.state.title}
         <br />
         <button onClick={this.handleChange}>change</button>
       </div>
