@@ -1,4 +1,5 @@
 import mountElement from './mountElement'
+import updateNodeElement from './updateNodeElement'
 import updateTextNode from './updateTextNode'
 
 export default function diff (virtualDOM, container, oldDOM) {
@@ -13,9 +14,11 @@ export default function diff (virtualDOM, container, oldDOM) {
       updateTextNode(virtualDOM, oldVirtualDOM, oldDOM)
     } else {
       // 更新元素属性
+      updateNodeElement(oldDOM, virtualDOM, oldVirtualDOM)
     }
 
     virtualDOM.children.forEach((child, index) => {
+      // console.log('ccc', child, oldDOM, oldDOM._virtualDOM, oldDOM.childNodes[index])
       diff(child, oldDOM, oldDOM.childNodes[index])
     })
   }

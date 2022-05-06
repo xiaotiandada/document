@@ -9,7 +9,7 @@ export default function createDOMElement (virtualDOM) {
   } else {
     // 元素节点
     newElement = document.createElement(virtualDOM.type)
-    updateNodeElement(virtualDOM, newElement)
+    updateNodeElement(newElement, virtualDOM)
   }
 
   newElement._virtualDOM = virtualDOM
