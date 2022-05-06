@@ -10,7 +10,7 @@ export default function updateNodeElement(newElement, virtualDOM, oldVirtualDOM 
     if (newPropsValue !== oldPropsValue) {
       // 考虑属性名称是否以 on 开头 如果是就表示是个事件属性 onClick -> click
       if (propName.slice(0, 2) === 'on') {
-        const eventName = propName.slice(2).toLowerCase()
+        const eventName = propName.toLowerCase().slice(2)
         newElement.addEventListener(eventName, newPropsValue)
 
         // 删除原有的事件的事件处理函数 
@@ -42,7 +42,7 @@ export default function updateNodeElement(newElement, virtualDOM, oldVirtualDOM 
     if (!newPropsValue) {
       // 属性被删除了
       if (propName.slice(0, 2) === 'on') {
-        const eventName = propName.slice(2).toLowerCase()
+        const eventName = propName.toLowerCase().slice(2)
         newElement.removeEventListener(eventName, oldPropsValue)
       } else if (propName !== 'children') {
         newElement.removeAttribute(propName)

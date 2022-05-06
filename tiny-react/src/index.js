@@ -33,7 +33,7 @@ const virtualDOM = (
       {2 == 2 && <div>2</div>}
       <span>这是一段内容 我被修改了</span>
       <button onClick={() => alert("你好 modify")}>点击我</button>
-      <h3>这个将会被删除</h3>
+      <h6>这个将会被删除</h6>
       2, 3
       <input type="text" value="123"></input>
       <input type="checkbox"  checked={true} />
