@@ -2,6 +2,7 @@ import createDOMElement from './createDOMElement'
 import mountElement from './mountElement'
 import updateNodeElement from './updateNodeElement'
 import updateTextNode from './updateTextNode'
+import unmmountNode from './unmmountNode'
 
 export default function diff (virtualDOM, container, oldDOM) {
   const oldVirtualDOM = oldDOM && oldDOM._virtualDOM
@@ -30,5 +31,22 @@ export default function diff (virtualDOM, container, oldDOM) {
       // console.log('ccc', child, oldDOM, oldDOM._virtualDOM, oldDOM.childNodes[index])
       diff(child, oldDOM, oldDOM.childNodes[index])
     })
+
+    // 首先会在前面更新 DOM，然后删除多余的 DOM
+    // 删除节点
+    // 获取旧节点
+    let oldChildNodes = oldDOM.childNodes
+    // 判断旧节点的数量
+    if (oldChildNodes.length > virtualDOM.children.length) {
+      // 有节点需要被删除
+      for (
+        let i = oldChildNodes.length - 1;
+        i > virtualDOM.children.length - 1;
+        i --
+      ) {
+        // console.log('oldChildNodes', oldChildNodes[i])
+        unmmountNode(oldChildNodes[i])
+      }
+    }
   }
 }
