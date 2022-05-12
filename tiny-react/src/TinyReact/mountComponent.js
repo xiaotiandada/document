@@ -1,29 +1,29 @@
-import isFunctionalComponent from './isFunctionalComponent'
-import mountNativeElement from './mountNativeElement'
+import isFunctionalComponent from "./isFunctionalComponent";
+import mountNativeElement from "./mountNativeElement";
 
-export default function mountComponent(virtualDOM, container) {
-  let nextVirtualDOM = null
+export default function mountComponent(virtualDOM, container, oldDOM) {
+  let nextVirtualDOM = null;
   if (isFunctionalComponent(virtualDOM)) {
-    nextVirtualDOM = bindFunctionComponent(virtualDOM)
+    nextVirtualDOM = bindFunctionComponent(virtualDOM);
   } else {
-    nextVirtualDOM = bindClassComponent(virtualDOM)
+    nextVirtualDOM = bindClassComponent(virtualDOM);
   }
-  console.log('nextVirtualDOM', nextVirtualDOM)
+  console.log("nextVirtualDOM", nextVirtualDOM);
 
   if (isFunctionalComponent(nextVirtualDOM)) {
-    mountComponent(nextVirtualDOM, container)
+    mountComponent(nextVirtualDOM, container, oldDOM);
   } else {
-    mountNativeElement(nextVirtualDOM, container)
+    mountNativeElement(nextVirtualDOM, container, oldDOM);
   }
 }
 
 function bindFunctionComponent(virtualDOM) {
-  return virtualDOM.type(virtualDOM.props || {})
+  return virtualDOM.type(virtualDOM.props || {});
 }
 
 function bindClassComponent(virtualDOM) {
-  const component = new virtualDOM.type(virtualDOM.props || {})
-  const nextVirtualDOM = component.render()
-  nextVirtualDOM.component = component
-  return nextVirtualDOM
+  const component = new virtualDOM.type(virtualDOM.props || {});
+  const nextVirtualDOM = component.render();
+  nextVirtualDOM.component = component;
+  return nextVirtualDOM;
 }
