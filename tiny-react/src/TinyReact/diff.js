@@ -40,10 +40,55 @@ export default function diff(virtualDOM, container, oldDOM) {
       updateNodeElement(oldDOM, virtualDOM, oldVirtualDOM);
     }
 
-    virtualDOM.children.forEach((child, index) => {
-      // console.log('ccc', child, oldDOM, oldDOM._virtualDOM, oldDOM.childNodes[index])
-      diff(child, oldDOM, oldDOM.childNodes[index]);
-    });
+    // 将拥有key属性的元素放入 keyedElements 对象中
+    let keyedElements = {};
+    for (let i = 0, len = oldDOM.childNodes.length; i < len; i++) {
+      const domElement = oldDOM.childNodes[i];
+      if (domElement.nodeType === 1) {
+        let key = domElement.getAttribute("key");
+        if (key) {
+          keyedElements[key] = domElement;
+        }
+      }
+    }
+
+    // 看一看是否有找到了拥有 key 属性的元素
+    let hasNoKey = Object.keys(keyedElements).length === 0;
+
+    // 如果没有找到拥有 key 属性的元素 就按照索引进行比较
+    if (hasNoKey) {
+      // 递归对比 Virtual DOM 的子元素
+      virtualDOM.children.forEach((child, index) => {
+        // console.log('ccc', child, oldDOM, oldDOM._virtualDOM, oldDOM.childNodes[index])
+        diff(child, oldDOM, oldDOM.childNodes[index]);
+      });
+    } else {
+      // 使用key属性进行元素比较
+      virtualDOM.children.forEach((child, i) => {
+        // 获取要进行比对的元素的 key 属性
+        let key = child.props.key;
+        // 如果 key 属性存在
+        if (key) {
+          // 到已存在的 DOM 元素对象中查找对应的 DOM 元素
+          let domElement = keyedElements[key];
+          // 如果找到元素就说明该元素已经存在 不需要重新渲染
+          if (domElement) {
+            // 虽然 DOM 元素不需要重新渲染 但是不能确定元素的位置就一定没有发生变化
+            // 所以还要查看一下元素的位置
+            // 看一下 oldDOM 对应的(i)子元素和 domElement 是否是同一个元素 如果不是就说明元素位置发生了变化
+            if (oldDOM.childNodes[i] && domElement !== oldDOM.childNodes[i]) {
+              // 元素位置发生了变化
+              // 将 domElement 插入到当前元素位置的前面 oldDOM.childNodes[i] 就是当前位置
+              // domElement 就被放入了当前位置
+              oldDOM.insertBefore(domElement, oldDOM.childNodes[i]);
+            }
+          } else {
+            // 新增元素
+            mountElement(child, oldDOM, oldDOM.childNodes[i]);
+          }
+        }
+      });
+    }
 
     // 首先会在前面更新 DOM，然后删除多余的 DOM
     // 删除节点
