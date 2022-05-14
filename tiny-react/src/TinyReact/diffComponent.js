@@ -1,4 +1,5 @@
 import mountElement from "./mountElement";
+import updateComponent from "./updateComponent";
 
 export default function diffComponent(
   virtualDOM,
@@ -9,7 +10,7 @@ export default function diffComponent(
   // 判断要更新的组件和未更新的组件是否是同一个组件 只需要确定两者使用的是否是同一个构造函数就可以了
   if (isSameComponent(virtualDOM, oldComponent)) {
     // 属同一个组件 做组件更新
-    console.log("tong yi");
+    updateComponent(virtualDOM, oldComponent, oldDOM, container);
   } else {
     // 不是同一个组件 直接将组件内容显示在页面中
     // 这里为 mountElement 方法新增了一个参数 oldDOM

@@ -74,6 +74,16 @@ class Alert extends TinyReact.Component {
     });
   }
 
+  componentWillReceiveProps() {
+    console.log("componentWillReceiveProps");
+  }
+  componentWillUpdate() {
+    console.log("componentWillUpdate");
+  }
+  componentDidUpdate() {
+    console.log("componentDidUpdate");
+  }
+
   render() {
     console.log("this", this.state);
     return (
@@ -92,8 +102,8 @@ class Alert extends TinyReact.Component {
 }
 TinyReact.render(<Alert name="zhangsan" age={18} />, root);
 setTimeout(() => {
-  // TinyReact.render(<Alert name="zhangsan123" age={20} />, root);
-  TinyReact.render(<Heart title="Hello React" />, root);
+  TinyReact.render(<Alert name="zhangsan123" age={20} />, root);
+  // TinyReact.render(<Heart title="Hello React" />, root);
 }, 2000);
 
 console.log(virtualDOM);
