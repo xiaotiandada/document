@@ -6,6 +6,7 @@ export default function mountNativeElement(virtualDOM, container, oldDOM) {
   const newElement = createDOMElement(virtualDOM);
 
   if (oldDOM) {
+    // console.log("mountNativeElement insertBefore", newElement, oldDOM);
     container.insertBefore(newElement, oldDOM);
   } else {
     // 将转换之后的 DOM 对象放置在页面中

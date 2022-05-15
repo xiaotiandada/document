@@ -80,6 +80,12 @@ export default function diff(virtualDOM, container, oldDOM) {
               // 元素位置发生了变化
               // 将 domElement 插入到当前元素位置的前面 oldDOM.childNodes[i] 就是当前位置
               // domElement 就被放入了当前位置
+              // console.log(
+              //   "insertBefore",
+              //   oldDOM,
+              //   domElement,
+              //   oldDOM.childNodes[i]
+              // );
               oldDOM.insertBefore(domElement, oldDOM.childNodes[i]);
             }
           } else {
