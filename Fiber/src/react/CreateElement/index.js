@@ -13,6 +13,5 @@ export default function createElement(type, props, ...children) {
   return {
     type,
     props: Object.assign({ children: childElements }, props),
-    children: childElements,
   };
 }
