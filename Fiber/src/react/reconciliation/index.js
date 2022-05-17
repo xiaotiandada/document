@@ -1,4 +1,4 @@
-import { createTaskQueue } from "../Misc";
+import { createTaskQueue, arrified } from "../Misc";
 
 const taskQueue = createTaskQueue();
 
@@ -22,7 +22,48 @@ const getFirstTask = () => {
     child: null,
   };
 };
-const executeTask = (fiber) => {};
+
+const reconcileChildren = (fiber, children) => {
+  /**
+   * children 可能对象 也可能是数组
+   * 将 children 转换成数组
+   */
+  const arrifiedChildren = arrified(children);
+
+  let index = 0;
+  let numberOfElements = arrifiedChildren.length;
+  let element = null;
+  let newFiber = null;
+  let prevFiber = null;
+
+  while (index < numberOfElements) {
+    element = arrifiedChildren[index];
+    newFiber = {
+      type: element.type,
+      props: element.props,
+      tag: "host_component",
+      effects: [],
+      effectTag: "placement",
+      stateNode: null,
+      parent: fiber,
+    };
+
+    if (index === 0) {
+      fiber.child = newFiber;
+    } else {
+      prevFiber.sibling = newFiber;
+    }
+
+    prevFiber = newFiber;
+
+    index++;
+  }
+};
+
+const executeTask = (fiber) => {
+  reconcileChildren(fiber, fiber.props.children);
+  console.log("f", fiber);
+};
 
 const workLoop = (deadline) => {
   /**

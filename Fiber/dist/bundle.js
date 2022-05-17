@@ -43,6 +43,24 @@ function createElement(type, props) {
 
 /***/ }),
 
+/***/ "./src/react/Misc/Arrified/index.js":
+/*!******************************************!*\
+  !*** ./src/react/Misc/Arrified/index.js ***!
+  \******************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+var arrified = function arrified(args) {
+  return Array.isArray(args) ? args : [args];
+};
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (arrified);
+
+/***/ }),
+
 /***/ "./src/react/Misc/CreateTaskQueue/index.js":
 /*!*************************************************!*\
   !*** ./src/react/Misc/CreateTaskQueue/index.js ***!
@@ -80,9 +98,12 @@ var createTaskQueue = function createTaskQueue() {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "arrified": () => (/* reexport safe */ _Arrified__WEBPACK_IMPORTED_MODULE_1__["default"]),
 /* harmony export */   "createTaskQueue": () => (/* reexport safe */ _CreateTaskQueue__WEBPACK_IMPORTED_MODULE_0__["default"])
 /* harmony export */ });
 /* harmony import */ var _CreateTaskQueue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./CreateTaskQueue */ "./src/react/Misc/CreateTaskQueue/index.js");
+/* harmony import */ var _Arrified__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Arrified */ "./src/react/Misc/Arrified/index.js");
+
 
 
 /***/ }),
@@ -142,7 +163,45 @@ var getFirstTask = function getFirstTask() {
   };
 };
 
-var executeTask = function executeTask(fiber) {};
+var reconcileChildren = function reconcileChildren(fiber, children) {
+  /**
+   * children 可能对象 也可能是数组
+   * 将 children 转换成数组
+   */
+  var arrifiedChildren = (0,_Misc__WEBPACK_IMPORTED_MODULE_0__.arrified)(children);
+  var index = 0;
+  var numberOfElements = arrifiedChildren.length;
+  var element = null;
+  var newFiber = null;
+  var prevFiber = null;
+
+  while (index < numberOfElements) {
+    element = arrifiedChildren[index];
+    newFiber = {
+      type: element.type,
+      props: element.props,
+      tag: "host_component",
+      effects: [],
+      effectTag: "placement",
+      stateNode: null,
+      parent: fiber
+    };
+
+    if (index === 0) {
+      fiber.child = newFiber;
+    } else {
+      prevFiber.sibling = newFiber;
+    }
+
+    prevFiber = newFiber;
+    index++;
+  }
+};
+
+var executeTask = function executeTask(fiber) {
+  reconcileChildren(fiber, fiber.props.children);
+  console.log("f", fiber);
+};
 
 var workLoop = function workLoop(deadline) {
   /**
@@ -271,8 +330,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./react */ "./src/react/index.js");
 
 var jsx = /*#__PURE__*/_react__WEBPACK_IMPORTED_MODULE_0__["default"].createElement("div", null, /*#__PURE__*/_react__WEBPACK_IMPORTED_MODULE_0__["default"].createElement("p", null, "Hello React"));
-console.log("client");
-console.log(jsx);
 var root = document.getElementById("root");
 (0,_react__WEBPACK_IMPORTED_MODULE_0__.render)(jsx, root);
 })();

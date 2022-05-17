@@ -6,8 +6,5 @@ const jsx = (
   </div>
 );
 
-console.log("client");
-console.log(jsx);
-
 const root = document.getElementById("root");
 render(jsx, root);
