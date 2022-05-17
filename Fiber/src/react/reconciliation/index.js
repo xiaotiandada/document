@@ -4,7 +4,24 @@ const taskQueue = createTaskQueue();
 
 let subTask = null;
 
-const getFirstTask = () => {};
+const getFirstTask = () => {
+  /**
+   * 从任务队列中获取任务
+   */
+  const task = taskQueue.pop();
+  console.log("task", task);
+
+  /**
+   * 返回最外层节点的 fiber 对象
+   */
+  return {
+    props: task.props,
+    stateNode: task.dom,
+    tag: "host_root",
+    effects: [],
+    child: null,
+  };
+};
 const executeTask = (fiber) => {};
 
 const workLoop = (deadline) => {
@@ -13,6 +30,7 @@ const workLoop = (deadline) => {
    */
   if (!subTask) {
     subTask = getFirstTask();
+    console.log("subTask", subTask);
   }
 
   /**
@@ -55,8 +73,6 @@ export const render = (element, dom) => {
     dom,
     props: { children: element },
   });
-
-  console.log(taskQueue.pop());
 
   /**
    * 指定在浏览器空闲的时间去执行任务

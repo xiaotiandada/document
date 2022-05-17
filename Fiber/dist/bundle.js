@@ -61,6 +61,9 @@ var createTaskQueue = function createTaskQueue() {
     },
     pop: function pop() {
       return taskQueue.shift();
+    },
+    isEmpty: function isEmpty() {
+      return taskQueue.length === 0;
     }
   };
 };
@@ -118,6 +121,64 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Misc__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../Misc */ "./src/react/Misc/index.js");
 
 var taskQueue = (0,_Misc__WEBPACK_IMPORTED_MODULE_0__.createTaskQueue)();
+var subTask = null;
+
+var getFirstTask = function getFirstTask() {
+  /**
+   * 从任务队列中获取任务
+   */
+  var task = taskQueue.pop();
+  console.log("task", task);
+  /**
+   * 返回最外层节点的 fiber 对象
+   */
+
+  return {
+    props: task.props,
+    stateNode: task.dom,
+    tag: "host_root",
+    effects: [],
+    child: null
+  };
+};
+
+var executeTask = function executeTask(fiber) {};
+
+var workLoop = function workLoop(deadline) {
+  /**
+   * 如果子任务不存在 就去获取子任务
+   */
+  if (!subTask) {
+    subTask = getFirstTask();
+    console.log("subTask", subTask);
+  }
+  /**
+   * 如果任务存在并且浏览器有空余的时间就调用
+   * executeTask 方法执行任务 接受任务 返回新的任务
+   */
+
+
+  while (subTask && deadline.timeRemaining() > 1) {
+    subTask = executeTask(subTask);
+  }
+};
+
+var performTask = function performTask(deadline) {
+  /**
+   * 执行任务
+   */
+  workLoop(deadline);
+  /**
+   * 判断任务是否存在
+   * 判断任务队列中是否还有任务没有执行
+   * 再一次告诉浏览器在空闲的时候执行任务
+   */
+
+  if (subTask || !taskQueue.isEmpty()) {
+    requestIdleCallback(performTask);
+  }
+};
+
 var render = function render(element, dom) {
   // taskQueue.push
 
@@ -135,7 +196,11 @@ var render = function render(element, dom) {
       children: element
     }
   });
-  console.log(taskQueue.pop());
+  /**
+   * 指定在浏览器空闲的时间去执行任务
+   */
+
+  requestIdleCallback(performTask);
 };
 
 /***/ })
