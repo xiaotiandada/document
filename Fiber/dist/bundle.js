@@ -372,6 +372,8 @@ var executeTask = function executeTask(fiber) {
   var currentExecutelyFiber = fiber;
 
   while (currentExecutelyFiber.parent) {
+    currentExecutelyFiber.parent.effects = currentExecutelyFiber.parent.effects.concat(currentExecutelyFiber.effects.concat([currentExecutelyFiber]));
+
     if (currentExecutelyFiber.sibling) {
       return currentExecutelyFiber.sibling;
     }
@@ -379,7 +381,7 @@ var executeTask = function executeTask(fiber) {
     currentExecutelyFiber = currentExecutelyFiber.parent;
   }
 
-  console.log("f", fiber);
+  console.log("fiber", fiber);
 };
 
 var workLoop = function workLoop(deadline) {
