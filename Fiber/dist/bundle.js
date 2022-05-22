@@ -302,6 +302,15 @@ __webpack_require__.r(__webpack_exports__);
 
 var taskQueue = (0,_Misc__WEBPACK_IMPORTED_MODULE_0__.createTaskQueue)();
 var subTask = null;
+var pendingCommit = null;
+
+var commitAllWork = function commitAllWork(fiber) {
+  fiber.effects.forEach(function (item) {
+    if (item.effectTag === "placement") {
+      item.parent.stateNode.appendChild(item.stateNode);
+    }
+  });
+};
 
 var getFirstTask = function getFirstTask() {
   /**
@@ -381,7 +390,8 @@ var executeTask = function executeTask(fiber) {
     currentExecutelyFiber = currentExecutelyFiber.parent;
   }
 
-  console.log("fiber", fiber);
+  pendingCommit = currentExecutelyFiber;
+  console.log(currentExecutelyFiber);
 };
 
 var workLoop = function workLoop(deadline) {
@@ -400,6 +410,10 @@ var workLoop = function workLoop(deadline) {
 
   while (subTask && deadline.timeRemaining() > 1) {
     subTask = executeTask(subTask);
+  }
+
+  if (pendingCommit) {
+    commitAllWork(pendingCommit);
   }
 };
 

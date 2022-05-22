@@ -4,6 +4,16 @@ const taskQueue = createTaskQueue();
 
 let subTask = null;
 
+let pendingCommit = null;
+
+const commitAllWork = (fiber) => {
+  fiber.effects.forEach((item) => {
+    if (item.effectTag === "placement") {
+      item.parent.stateNode.appendChild(item.stateNode);
+    }
+  });
+};
+
 const getFirstTask = () => {
   /**
    * 从任务队列中获取任务
@@ -87,7 +97,9 @@ const executeTask = (fiber) => {
     currentExecutelyFiber = currentExecutelyFiber.parent;
   }
 
-  console.log("fiber", fiber);
+  pendingCommit = currentExecutelyFiber;
+
+  console.log(currentExecutelyFiber);
 };
 
 const workLoop = (deadline) => {
@@ -105,6 +117,10 @@ const workLoop = (deadline) => {
    */
   while (subTask && deadline.timeRemaining() > 1) {
     subTask = executeTask(subTask);
+  }
+
+  if (pendingCommit) {
+    commitAllWork(pendingCommit);
   }
 };
 
