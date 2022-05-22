@@ -223,6 +223,26 @@ var createStateNode = function createStateNode(fiber) {
 
 /***/ }),
 
+/***/ "./src/react/Misc/getTag/index.js":
+/*!****************************************!*\
+  !*** ./src/react/Misc/getTag/index.js ***!
+  \****************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+var getTag = function getTag(vdom) {
+  if (typeof vdom.type === "string") {
+    return "host_component";
+  }
+};
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (getTag);
+
+/***/ }),
+
 /***/ "./src/react/Misc/index.js":
 /*!*********************************!*\
   !*** ./src/react/Misc/index.js ***!
@@ -233,11 +253,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "arrified": () => (/* reexport safe */ _Arrified__WEBPACK_IMPORTED_MODULE_1__["default"]),
 /* harmony export */   "createStateNode": () => (/* reexport safe */ _createStateNode__WEBPACK_IMPORTED_MODULE_2__["default"]),
-/* harmony export */   "createTaskQueue": () => (/* reexport safe */ _CreateTaskQueue__WEBPACK_IMPORTED_MODULE_0__["default"])
+/* harmony export */   "createTaskQueue": () => (/* reexport safe */ _CreateTaskQueue__WEBPACK_IMPORTED_MODULE_0__["default"]),
+/* harmony export */   "getTag": () => (/* reexport safe */ _getTag__WEBPACK_IMPORTED_MODULE_3__["default"])
 /* harmony export */ });
 /* harmony import */ var _CreateTaskQueue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./CreateTaskQueue */ "./src/react/Misc/CreateTaskQueue/index.js");
 /* harmony import */ var _Arrified__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Arrified */ "./src/react/Misc/Arrified/index.js");
 /* harmony import */ var _createStateNode__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./createStateNode */ "./src/react/Misc/createStateNode/index.js");
+/* harmony import */ var _getTag__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./getTag */ "./src/react/Misc/getTag/index.js");
+
 
 
 
@@ -316,7 +339,7 @@ var reconcileChildren = function reconcileChildren(fiber, children) {
     newFiber = {
       type: element.type,
       props: element.props,
-      tag: "host_component",
+      tag: (0,_Misc__WEBPACK_IMPORTED_MODULE_0__.getTag)(element),
       effects: [],
       effectTag: "placement",
       // stateNode: null,
