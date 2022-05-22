@@ -43,6 +43,116 @@ function createElement(type, props) {
 
 /***/ }),
 
+/***/ "./src/react/DOM/createDOMElement.js":
+/*!*******************************************!*\
+  !*** ./src/react/DOM/createDOMElement.js ***!
+  \*******************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ createDOMElement)
+/* harmony export */ });
+/* harmony import */ var _updateNodeElement__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./updateNodeElement */ "./src/react/DOM/updateNodeElement.js");
+
+function createDOMElement(virtualDOM) {
+  var newElement = null;
+
+  if (virtualDOM.type === "text") {
+    // 文本节点
+    newElement = document.createTextNode(virtualDOM.props.textContent);
+  } else {
+    // 元素节点
+    newElement = document.createElement(virtualDOM.type);
+    (0,_updateNodeElement__WEBPACK_IMPORTED_MODULE_0__["default"])(newElement, virtualDOM);
+  }
+
+  return newElement;
+}
+
+/***/ }),
+
+/***/ "./src/react/DOM/index.js":
+/*!********************************!*\
+  !*** ./src/react/DOM/index.js ***!
+  \********************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "createDOMElement": () => (/* reexport safe */ _createDOMElement__WEBPACK_IMPORTED_MODULE_0__["default"]),
+/* harmony export */   "updateNodeElement": () => (/* reexport safe */ _updateNodeElement__WEBPACK_IMPORTED_MODULE_1__["default"])
+/* harmony export */ });
+/* harmony import */ var _createDOMElement__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./createDOMElement */ "./src/react/DOM/createDOMElement.js");
+/* harmony import */ var _updateNodeElement__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./updateNodeElement */ "./src/react/DOM/updateNodeElement.js");
+
+
+
+/***/ }),
+
+/***/ "./src/react/DOM/updateNodeElement.js":
+/*!********************************************!*\
+  !*** ./src/react/DOM/updateNodeElement.js ***!
+  \********************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ updateNodeElement)
+/* harmony export */ });
+function updateNodeElement(newElement, virtualDOM) {
+  var oldVirtualDOM = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+  // 获取节点对应的属性对象
+  var newProps = virtualDOM.props;
+  var oldProps = oldVirtualDOM.props || {};
+  Object.keys(newProps).forEach(function (propName) {
+    // 获取属性值
+    var newPropsValue = newProps[propName];
+    var oldPropsValue = oldProps[propName];
+
+    if (newPropsValue !== oldPropsValue) {
+      // 考虑属性名称是否以 on 开头 如果是就表示是个事件属性 onClick -> click
+      if (propName.slice(0, 2) === 'on') {
+        var eventName = propName.toLowerCase().slice(2);
+        newElement.addEventListener(eventName, newPropsValue); // 删除原有的事件的事件处理函数 
+
+        if (oldPropsValue) {
+          newElement.removeEventListener(eventName, oldPropsValue);
+        }
+      } else if (propName === 'value' || propName === 'checked') {
+        // 如果属性名称是 value 或者 checked 需要通过 [] 的形式添加
+        newElement[propName] = newPropsValue;
+      } else if (propName !== 'children') {
+        // 刨除 children 因为它是子元素 不是属性
+        if (propName === 'className') {
+          // className 属性单独处理 不直接在元素上添加 class 属性是因为 class 是 JavaScript 中的关键字
+          newElement.setAttribute('class', newPropsValue);
+        } else {
+          // 普通属性
+          newElement.setAttribute(propName, newPropsValue);
+        }
+      }
+    }
+  }); // 判断属性被删除的情况
+
+  Object.keys(oldProps).forEach(function (propName) {
+    var newPropsValue = newProps[propName];
+    var oldPropsValue = oldProps[propName];
+
+    if (!newPropsValue) {
+      // 属性被删除了
+      if (propName.slice(0, 2) === 'on') {
+        var eventName = propName.toLowerCase().slice(2);
+        newElement.removeEventListener(eventName, oldPropsValue);
+      } else if (propName !== 'children') {
+        newElement.removeAttribute(propName);
+      }
+    }
+  });
+}
+
+/***/ }),
+
 /***/ "./src/react/Misc/Arrified/index.js":
 /*!******************************************!*\
   !*** ./src/react/Misc/Arrified/index.js ***!
@@ -90,6 +200,29 @@ var createTaskQueue = function createTaskQueue() {
 
 /***/ }),
 
+/***/ "./src/react/Misc/createStateNode/index.js":
+/*!*************************************************!*\
+  !*** ./src/react/Misc/createStateNode/index.js ***!
+  \*************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _DOM__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../DOM */ "./src/react/DOM/index.js");
+
+
+var createStateNode = function createStateNode(fiber) {
+  if (fiber.tag === "host_component") {
+    return (0,_DOM__WEBPACK_IMPORTED_MODULE_0__.createDOMElement)(fiber);
+  }
+};
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (createStateNode);
+
+/***/ }),
+
 /***/ "./src/react/Misc/index.js":
 /*!*********************************!*\
   !*** ./src/react/Misc/index.js ***!
@@ -99,10 +232,13 @@ var createTaskQueue = function createTaskQueue() {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "arrified": () => (/* reexport safe */ _Arrified__WEBPACK_IMPORTED_MODULE_1__["default"]),
+/* harmony export */   "createStateNode": () => (/* reexport safe */ _createStateNode__WEBPACK_IMPORTED_MODULE_2__["default"]),
 /* harmony export */   "createTaskQueue": () => (/* reexport safe */ _CreateTaskQueue__WEBPACK_IMPORTED_MODULE_0__["default"])
 /* harmony export */ });
 /* harmony import */ var _CreateTaskQueue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./CreateTaskQueue */ "./src/react/Misc/CreateTaskQueue/index.js");
 /* harmony import */ var _Arrified__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Arrified */ "./src/react/Misc/Arrified/index.js");
+/* harmony import */ var _createStateNode__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./createStateNode */ "./src/react/Misc/createStateNode/index.js");
+
 
 
 
@@ -183,9 +319,10 @@ var reconcileChildren = function reconcileChildren(fiber, children) {
       tag: "host_component",
       effects: [],
       effectTag: "placement",
-      stateNode: null,
+      // stateNode: null,
       parent: fiber
     };
+    newFiber.stateNode = (0,_Misc__WEBPACK_IMPORTED_MODULE_0__.createStateNode)(newFiber);
 
     if (index === 0) {
       fiber.child = newFiber;

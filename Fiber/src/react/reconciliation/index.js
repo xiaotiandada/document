@@ -1,4 +1,4 @@
-import { createTaskQueue, arrified } from "../Misc";
+import { createTaskQueue, arrified, createStateNode } from "../Misc";
 
 const taskQueue = createTaskQueue();
 
@@ -44,9 +44,11 @@ const reconcileChildren = (fiber, children) => {
       tag: "host_component",
       effects: [],
       effectTag: "placement",
-      stateNode: null,
+      // stateNode: null,
       parent: fiber,
     };
+
+    newFiber.stateNode = createStateNode(newFiber);
 
     if (index === 0) {
       fiber.child = newFiber;
