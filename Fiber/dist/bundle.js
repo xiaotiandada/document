@@ -360,9 +360,23 @@ var reconcileChildren = function reconcileChildren(fiber, children) {
 
 var executeTask = function executeTask(fiber) {
   reconcileChildren(fiber, fiber.props.children);
+  /**
+   * 如果子级存在 返回子级
+   * 将这个子级当作父级 构建这个父级下的子级
+   */
 
   if (fiber.child) {
     return fiber.child;
+  }
+
+  var currentExecutelyFiber = fiber;
+
+  while (currentExecutelyFiber.parent) {
+    if (currentExecutelyFiber.sibling) {
+      return currentExecutelyFiber.sibling;
+    }
+
+    currentExecutelyFiber = currentExecutelyFiber.parent;
   }
 
   console.log("f", fiber);
@@ -494,7 +508,7 @@ var __webpack_exports__ = {};
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./react */ "./src/react/index.js");
 
-var jsx = /*#__PURE__*/_react__WEBPACK_IMPORTED_MODULE_0__["default"].createElement("div", null, /*#__PURE__*/_react__WEBPACK_IMPORTED_MODULE_0__["default"].createElement("p", null, "Hello React"));
+var jsx = /*#__PURE__*/_react__WEBPACK_IMPORTED_MODULE_0__["default"].createElement("div", null, /*#__PURE__*/_react__WEBPACK_IMPORTED_MODULE_0__["default"].createElement("p", null, "Hello React"), /*#__PURE__*/_react__WEBPACK_IMPORTED_MODULE_0__["default"].createElement("p", null, "Hello Fiber"));
 var root = document.getElementById("root");
 (0,_react__WEBPACK_IMPORTED_MODULE_0__.render)(jsx, root);
 })();
