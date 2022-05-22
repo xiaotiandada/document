@@ -360,6 +360,11 @@ var reconcileChildren = function reconcileChildren(fiber, children) {
 
 var executeTask = function executeTask(fiber) {
   reconcileChildren(fiber, fiber.props.children);
+
+  if (fiber.child) {
+    return fiber.child;
+  }
+
   console.log("f", fiber);
 };
 

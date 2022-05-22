@@ -64,6 +64,9 @@ const reconcileChildren = (fiber, children) => {
 
 const executeTask = (fiber) => {
   reconcileChildren(fiber, fiber.props.children);
+  if (fiber.child) {
+    return fiber.child;
+  }
   console.log("f", fiber);
 };
 
