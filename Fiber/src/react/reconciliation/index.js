@@ -9,7 +9,14 @@ let pendingCommit = null;
 const commitAllWork = (fiber) => {
   fiber.effects.forEach((item) => {
     if (item.effectTag === "placement") {
-      item.parent.stateNode.appendChild(item.stateNode);
+      let fiber = item;
+      let parentFiber = item.parent;
+      while (parentFiber.tag === "class_component") {
+        parentFiber = parentFiber.parent;
+      }
+      if (fiber.tag === "host_component") {
+        parentFiber.stateNode.appendChild(fiber.stateNode);
+      }
     }
   });
 };
@@ -34,6 +41,7 @@ const getFirstTask = () => {
 };
 
 const reconcileChildren = (fiber, children) => {
+  console.log("reconcileChildren", children);
   /**
    * children 可能对象 也可能是数组
    * 将 children 转换成数组
@@ -73,7 +81,15 @@ const reconcileChildren = (fiber, children) => {
 };
 
 const executeTask = (fiber) => {
-  reconcileChildren(fiber, fiber.props.children);
+  /**
+   * 构建子级 fiber 对象
+   */
+  if (fiber.tag === "class_component") {
+    reconcileChildren(fiber, fiber.stateNode.render());
+  } else {
+    reconcileChildren(fiber, fiber.props.children);
+  }
+
   /**
    * 如果子级存在 返回子级
    * 将这个子级当作父级 构建这个父级下的子级
