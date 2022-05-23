@@ -372,7 +372,7 @@ var commitAllWork = function commitAllWork(fiber) {
       var _fiber = item;
       var parentFiber = item.parent;
 
-      while (parentFiber.tag === "class_component") {
+      while (parentFiber.tag === "class_component" || parentFiber.tag === "function_component") {
         parentFiber = parentFiber.parent;
       }
 
@@ -446,6 +446,8 @@ var executeTask = function executeTask(fiber) {
    */
   if (fiber.tag === "class_component") {
     reconcileChildren(fiber, fiber.stateNode.render());
+  } else if (fiber.tag === "function_component") {
+    reconcileChildren(fiber, fiber.stateNode(fiber.props));
   } else {
     reconcileChildren(fiber, fiber.props.children);
   }
@@ -644,14 +646,21 @@ var Greating = /*#__PURE__*/function (_Component) {
   _createClass(Greating, [{
     key: "render",
     value: function render() {
-      return /*#__PURE__*/_react__WEBPACK_IMPORTED_MODULE_0__["default"].createElement("div", null, "hahahaha");
+      return /*#__PURE__*/_react__WEBPACK_IMPORTED_MODULE_0__["default"].createElement("div", null, this.props.title, " hahahaha");
     }
   }]);
 
   return Greating;
-}(_react__WEBPACK_IMPORTED_MODULE_0__.Component);
+}(_react__WEBPACK_IMPORTED_MODULE_0__.Component); // render(<Greating title="class" />, root);
 
-(0,_react__WEBPACK_IMPORTED_MODULE_0__.render)( /*#__PURE__*/_react__WEBPACK_IMPORTED_MODULE_0__["default"].createElement(Greating, null), root);
+
+function FnComponent(props) {
+  return /*#__PURE__*/_react__WEBPACK_IMPORTED_MODULE_0__["default"].createElement("div", null, props.title, " FnComponent");
+}
+
+(0,_react__WEBPACK_IMPORTED_MODULE_0__.render)( /*#__PURE__*/_react__WEBPACK_IMPORTED_MODULE_0__["default"].createElement(FnComponent, {
+  title: "hello"
+}), root);
 })();
 
 /******/ })()
