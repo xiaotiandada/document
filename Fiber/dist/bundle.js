@@ -394,7 +394,9 @@ var commitAllWork = function commitAllWork(fiber) {
    * 循环 effect 数组 构建 DOM 节点树
    */
   fiber.effects.forEach(function (item) {
-    if (item.effectTag === "update") {
+    if (item.effectTag === "delete") {
+      item.parent.stateNode.removeChild(item.stateNode);
+    } else if (item.effectTag === "update") {
       /**
        * 更新
        */
@@ -486,13 +488,19 @@ var reconcileChildren = function reconcileChildren(fiber, children) {
     alternate = fiber.alternate.child;
   }
 
-  while (index < numberOfElements) {
+  while (index < numberOfElements || alternate) {
     /**
      * 子级 virtualDOM 对象
      */
     element = arrifiedChildren[index];
 
-    if (element && alternate) {
+    if (!element && alternate) {
+      /**
+       * 删除操作
+       */
+      alternate.effectTag = "delete";
+      fiber.effects.push(alternate);
+    } else if (element && alternate) {
       /**
        * 更新
        */
@@ -544,7 +552,7 @@ var reconcileChildren = function reconcileChildren(fiber, children) {
 
     if (index === 0) {
       fiber.child = newFiber;
-    } else {
+    } else if (element) {
       prevFiber.sibling = newFiber;
     }
 
@@ -752,7 +760,7 @@ var jsx = /*#__PURE__*/_react__WEBPACK_IMPORTED_MODULE_0__["default"].createElem
 var root = document.getElementById("root");
 (0,_react__WEBPACK_IMPORTED_MODULE_0__.render)(jsx, root);
 setTimeout(function () {
-  var jsx = /*#__PURE__*/_react__WEBPACK_IMPORTED_MODULE_0__["default"].createElement("div", null, /*#__PURE__*/_react__WEBPACK_IMPORTED_MODULE_0__["default"].createElement("div", null, "Fiber"), /*#__PURE__*/_react__WEBPACK_IMPORTED_MODULE_0__["default"].createElement("p", null, "Hello Fiber"));
+  var jsx = /*#__PURE__*/_react__WEBPACK_IMPORTED_MODULE_0__["default"].createElement("div", null, /*#__PURE__*/_react__WEBPACK_IMPORTED_MODULE_0__["default"].createElement("div", null, "Fiber"));
   (0,_react__WEBPACK_IMPORTED_MODULE_0__.render)(jsx, root);
 }, 2000);
 
