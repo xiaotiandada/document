@@ -8,7 +8,18 @@ const jsx = (
 );
 
 const root = document.getElementById("root");
-// render(jsx, root);
+render(jsx, root);
+
+setTimeout(() => {
+  const jsx = (
+    <div>
+      <div>Fiber</div>
+      <p>Hello Fiber</p>
+    </div>
+  );
+
+  render(jsx, root);
+}, 2000);
 
 class Greating extends Component {
   constructor(props) {
@@ -26,4 +37,4 @@ function FnComponent(props) {
   return <div>{props.title} FnComponent</div>;
 }
 
-render(<FnComponent title="hello" />, root);
+// render(<FnComponent title="hello" />, root);
