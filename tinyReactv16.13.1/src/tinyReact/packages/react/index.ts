@@ -1,1 +1,1 @@
-console.log('test');
+export { createElement, isValidElement } from './src/React';
