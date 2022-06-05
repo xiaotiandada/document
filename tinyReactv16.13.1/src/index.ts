@@ -1,6 +1,7 @@
 'use strict';
 
 import * as React from './tinyReact/packages/react/index';
+import * as ReactDOM from './tinyReact/packages/react-dom/index';
 
 /*#__PURE__*/
 const jsx = React.createElement(
@@ -28,3 +29,9 @@ const jsx = React.createElement(
 console.log('Hello World!', jsx);
 
 console.log('isValidElement', React.isValidElement(jsx));
+
+const root = document.getElementById('root');
+
+ReactDOM.render(jsx, root, () => {
+  console.log('render callback');
+});
