@@ -11,6 +11,7 @@ import {
   LegacyRoot,
 } from '../../../shared/ReactRootTags';
 import type { RootTag } from '../../../shared/ReactRootTags';
+import { createContainer } from '../../../react-reconciler/inline.dom';
 
 export type RootType = {
   render(children: any): void;
@@ -25,19 +26,39 @@ export type RootOptions = {
   };
 };
 
+function createRootImpl(
+  container: Container,
+  tag: RootTag,
+  options: void | RootOptions
+) {
+  console.log('createRootImpl', container, tag, options);
+  const hydrate = false;
+  const hydrationCallbacks: any = null;
+
+  const root = createContainer(container, tag, hydrate, hydrationCallbacks);
+  // markContainerAsRoot(root.current, container);
+  return root;
+}
+
+/**
+ * 类, 通过它可以创建 LegacyRoot 的 Fiber 数据结构
+ */
 function ReactDOMBlockingRoot(
   container: Container,
   tag: RootTag,
   options: void | RootOptions
 ) {
-  this._internalRoot = {};
+  this._internalRoot = createRootImpl(container, tag, options);
 }
 
 export function createLegacyRoot(
   container: Container,
   options?: RootOptions
 ): RootType {
-  return {} as RootType;
+  // container => <div id="root"></div>
+  // LegacyRoot 常量, 值为 0,
+  // 通过 render 方法创建的 container 就是 LegacyRoot
+  return new (ReactDOMBlockingRoot as any)(container, LegacyRoot, options);
 }
 
 /**
