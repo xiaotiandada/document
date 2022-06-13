@@ -47,12 +47,14 @@ function FiberRootNode(containerInfo: any, tag: RootTag, hydrate: boolean) {
   }
 }
 
+// 创建根节点对应的 fiber 对象
 export function createFiberRoot(
   containerInfo: any,
   tag: RootTag,
   hydrate: boolean,
   hydrationCallbacks: null
 ): FiberRoot {
+  // 创建 FiberRoot
   const root: FiberRoot = new (FiberRootNode as any)(
     containerInfo,
     tag,
@@ -61,9 +63,13 @@ export function createFiberRoot(
 
   // Cyclic construction. This cheats the type system right now because
   // stateNode is any.
+  // 创建根节点对应的 rootFiber
   const uninitializedFiber = createHostRootFiber(tag);
+  // 为 fiberRoot 添加 current 属性 值为 rootFiber
   root.current = uninitializedFiber;
+  // 为 rootFiber 添加 stateNode 属性 值为 fiberRoot
   uninitializedFiber.stateNode = root;
 
+  // 返回 root
   return root;
 }

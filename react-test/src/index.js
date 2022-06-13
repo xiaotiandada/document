@@ -7,8 +7,13 @@ import reportWebVitals from './reportWebVitals';
 // const root = ReactDOM.createRoot(document.getElementById('root'));
 ReactDOM.render(
   // <React.StrictMode>
-  <App />,
+  // <App />,
   // </React.StrictMode>,
+  // <div title="title">
+  //   <div title="hello">Hello</div>
+  //   <div title="world">World</div>
+  // </div>,
+  <div>react</div>,
   document.getElementById('root')
 );
 

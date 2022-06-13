@@ -9,6 +9,7 @@ import {
   COMMENT_NODE,
 } from '../shared/HTMLNodeType';
 import { ROOT_ATTRIBUTE_NAME } from '../shared/DOMProperty';
+import { getPublicRootInstance } from '../../../react-reconciler/inline.dom';
 
 const __DEV__ = true;
 
@@ -120,21 +121,52 @@ function legacyRenderSubtreeIntoContainer(
   forceHydrate: boolean,
   callback?: Function
 ) {
+  /**
+   * 检测 container 是否已经是初始化过的渲染容器
+   * react 在初始渲染时会为最外层容器添加 _reactRootContainer 属性
+   * react 会根据此属性进行不同的渲染方式
+   * root 不存在 表示初始渲染
+   * root 存在 表示更新
+   */
+  console.log('children', children);
+  // 获取 container 容器对象下是否有 _reactRootContainer 属性
   let root: RootType = container._reactRootContainer as any;
+  // 即将存储根 Fiber 对象
   let fiberRoot;
 
   if (!root) {
+    // 初始渲染
+    // 初始化根 Fiber 数据结构
+    // 为 container 容器添加 _reactRootContainer 属性
+    // 在 _reactRootContainer 对象中有一个属性叫做 _internalRoot
+    // _internalRoot 属性值即为 FiberRoot, 表示根节点 Fiber 数据结构
+
     // Initial mount
     // legacyCreateRootFromDOMContainer: 清除container的所有子DOM
+    // createLegacyRoot: 调用 new ReactDOMBlockingRoot: { _internalRoot: FiberRootNode }
+    // new ReactDOMBlockingRoot -> this._internalRoot
+    // createRootImpl
+
+    /**
+     * container = <div id="root"></div>
+     * root = container._reactRootContainer = { _internalRoot: FiberRootNode }
+     * <div id="root"></div>._reactRootContainer._internalRoot = FiberRootNode
+     */
     root = container._reactRootContainer = legacyCreateRootFromDOMContainer(
       container,
       forceHydrate
     );
 
     console.log('root', root);
+
+    // 获取 Fiber Root 对象
+    fiberRoot = root._internalRoot;
   }
 
-  return {};
+  // 返回 render 方法第一个参数的真实 DOM 对象作为 render 方法的返回值
+  // 就是说渲染谁 返回谁的真实 DOM 对象
+  console.log('fiberRoot', fiberRoot);
+  return getPublicRootInstance(fiberRoot);
 }
 
 /**

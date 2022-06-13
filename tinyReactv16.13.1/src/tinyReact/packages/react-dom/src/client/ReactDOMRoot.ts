@@ -35,6 +35,9 @@ function createRootImpl(
   const hydrate = false;
   const hydrationCallbacks: any = null;
 
+  // container => <div id="root"></div>
+  // tag => 0
+  // options => undefined
   const root = createContainer(container, tag, hydrate, hydrationCallbacks);
   // markContainerAsRoot(root.current, container);
   return root;
@@ -48,6 +51,9 @@ function ReactDOMBlockingRoot(
   tag: RootTag,
   options: void | RootOptions
 ) {
+  // tag => 0 => legacyRoot
+  // container => <div id="root"></div>
+  // container._reactRootContainer = {_internalRoot: {}}
   this._internalRoot = createRootImpl(container, tag, options);
 }
 

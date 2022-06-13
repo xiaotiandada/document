@@ -26,12 +26,14 @@ const jsx = React.createElement(
   )
 );
 
+const jsx1 = React.createElement('div', null, 'react');
+
 console.log('Hello World!', jsx);
 
 console.log('isValidElement', React.isValidElement(jsx));
 
 const root = document.getElementById('root');
 
-ReactDOM.render(jsx, root, () => {
+ReactDOM.render(jsx1, root, () => {
   console.log('render callback');
 });
