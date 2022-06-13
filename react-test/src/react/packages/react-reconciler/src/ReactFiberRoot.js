@@ -141,6 +141,7 @@ export function createFiberRoot(
   hydrationCallbacks: null | SuspenseHydrationCallbacks,
 ): FiberRoot {
   const root: FiberRoot = (new FiberRootNode(containerInfo, tag, hydrate): any);
+  console.log('root', root);
   if (enableSuspenseCallback) {
     root.hydrationCallbacks = hydrationCallbacks;
   }

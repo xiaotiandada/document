@@ -6,6 +6,7 @@ import {
   enableSchedulerTracing,
   enableSuspenseCallback,
 } from '../../shared/ReactFeatureFlags';
+import { createHostRootFiber } from './ReactFiber';
 
 // Exported FiberRoot type includes all properties,
 // To avoid requiring potentially error-prone :any casts throughout the project.
@@ -57,5 +58,12 @@ export function createFiberRoot(
     tag,
     hydrate
   ) as any;
+
+  // Cyclic construction. This cheats the type system right now because
+  // stateNode is any.
+  const uninitializedFiber = createHostRootFiber(tag);
+  root.current = uninitializedFiber;
+  uninitializedFiber.stateNode = root;
+
   return root;
 }
