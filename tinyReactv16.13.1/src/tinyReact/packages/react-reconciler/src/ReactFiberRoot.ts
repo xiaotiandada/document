@@ -66,7 +66,7 @@ export function createFiberRoot(
   // 创建根节点对应的 rootFiber
   const uninitializedFiber = createHostRootFiber(tag);
   // 为 fiberRoot 添加 current 属性 值为 rootFiber
-  root.current = uninitializedFiber;
+  (root as any).current = uninitializedFiber;
   // 为 rootFiber 添加 stateNode 属性 值为 fiberRoot
   uninitializedFiber.stateNode = root;
 

@@ -9,7 +9,11 @@ import {
   COMMENT_NODE,
 } from '../shared/HTMLNodeType';
 import { ROOT_ATTRIBUTE_NAME } from '../shared/DOMProperty';
-import { getPublicRootInstance } from '../../../react-reconciler/inline.dom';
+import {
+  getPublicRootInstance,
+  unbatchedUpdates,
+  updateContainer,
+} from '../../../react-reconciler/inline.dom';
 
 const __DEV__ = true;
 
@@ -161,6 +165,14 @@ function legacyRenderSubtreeIntoContainer(
 
     // 获取 Fiber Root 对象
     fiberRoot = root._internalRoot;
+
+    // 初始化渲染不执行批量更新
+    // 因为批量更新是异步的是可以被打断的, 但是初始化渲染应该尽快完成不能被打断
+    // 所以不执行批量更新
+    // unbatchedUpdates(() => {
+    //   updateContainer(children, fiberRoot, parentComponent, callback);
+    // });
+    updateContainer(children, fiberRoot, parentComponent, callback);
   }
 
   // 返回 render 方法第一个参数的真实 DOM 对象作为 render 方法的返回值

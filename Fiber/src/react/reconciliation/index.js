@@ -1,11 +1,11 @@
-import { updateNodeElement } from "../DOM";
+import { updateNodeElement } from '../DOM';
 import {
   createTaskQueue,
   arrified,
   createStateNode,
   getTag,
   getRoot,
-} from "../Misc";
+} from '../Misc';
 
 /**
  * 任务队列
@@ -24,13 +24,13 @@ const commitAllWork = (fiber) => {
    * 循环 effect 数组 构建 DOM 节点树
    */
   fiber.effects.forEach((item) => {
-    if (item.tag === "class_component") {
+    if (item.tag === 'class_component') {
       item.stateNode.__fiber = item;
     }
 
-    if (item.effectTag === "delete") {
+    if (item.effectTag === 'delete') {
       item.parent.stateNode.removeChild(item.stateNode);
-    } else if (item.effectTag === "update") {
+    } else if (item.effectTag === 'update') {
       /**
        * 更新
        */
@@ -48,16 +48,16 @@ const commitAllWork = (fiber) => {
           item.alternate.stateNode
         );
       }
-    } else if (item.effectTag === "placement") {
+    } else if (item.effectTag === 'placement') {
       let fiber = item;
       let parentFiber = item.parent;
       while (
-        parentFiber.tag === "class_component" ||
-        parentFiber.tag === "function_component"
+        parentFiber.tag === 'class_component' ||
+        parentFiber.tag === 'function_component'
       ) {
         parentFiber = parentFiber.parent;
       }
-      if (fiber.tag === "host_component") {
+      if (fiber.tag === 'host_component') {
         parentFiber.stateNode.appendChild(fiber.stateNode);
       }
     }
@@ -74,16 +74,16 @@ const getFirstTask = () => {
    * 从任务队列中获取任务
    */
   const task = taskQueue.pop();
-  console.log("task", task);
+  console.log('task', task);
 
-  if (task.from === "class_component") {
+  if (task.from === 'class_component') {
     const root = getRoot(task.instance);
     task.instance.__fiber.partialState = task.partialState;
 
     return {
       props: root.props,
       stateNode: root.stateNode,
-      tag: "host_root",
+      tag: 'host_root',
       effects: [],
       child: null,
       alternate: root,
@@ -96,7 +96,7 @@ const getFirstTask = () => {
   return {
     props: task.props,
     stateNode: task.dom,
-    tag: "host_root",
+    tag: 'host_root',
     effects: [],
     child: null,
     alternate: task.dom.__rootFiberContainer,
@@ -147,7 +147,7 @@ const reconcileChildren = (fiber, children) => {
       /**
        * 删除操作
        */
-      alternate.effectTag = "delete";
+      alternate.effectTag = 'delete';
       fiber.effects.push(alternate);
     } else if (element && alternate) {
       /**
@@ -158,7 +158,7 @@ const reconcileChildren = (fiber, children) => {
         props: element.props,
         tag: getTag(element),
         effects: [],
-        effectTag: "update",
+        effectTag: 'update',
         // stateNode: null,
         parent: fiber,
         alternate,
@@ -187,7 +187,7 @@ const reconcileChildren = (fiber, children) => {
         props: element.props,
         tag: getTag(element),
         effects: [],
-        effectTag: "placement",
+        effectTag: 'placement',
         // stateNode: null,
         parent: fiber,
       };
@@ -220,7 +220,7 @@ const executeTask = (fiber) => {
   /**
    * 构建子级 fiber 对象
    */
-  if (fiber.tag === "class_component") {
+  if (fiber.tag === 'class_component') {
     if (fiber.stateNode.__fiber && fiber.stateNode.__fiber.partialState) {
       /**
        * 更新状态
@@ -232,7 +232,7 @@ const executeTask = (fiber) => {
     }
 
     reconcileChildren(fiber, fiber.stateNode.render());
-  } else if (fiber.tag === "function_component") {
+  } else if (fiber.tag === 'function_component') {
     reconcileChildren(fiber, fiber.stateNode(fiber.props));
   } else {
     reconcileChildren(fiber, fiber.props.children);
@@ -272,7 +272,7 @@ const workLoop = (deadline) => {
    */
   if (!subTask) {
     subTask = getFirstTask();
-    console.log("subTask", subTask);
+    console.log('subTask', subTask);
   }
 
   /**
@@ -328,7 +328,7 @@ export const render = (element, dom) => {
 
 export const scheduleUpdate = (instance, partialState) => {
   taskQueue.push({
-    from: "class_component",
+    from: 'class_component',
     instance,
     partialState,
   });
