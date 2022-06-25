@@ -2,14 +2,17 @@
 
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const { CheckerPlugin } = require('awesome-typescript-loader');
 
 const isProduction = process.env.NODE_ENV == 'production';
 
 const config = {
-  entry: './src/index.ts',
+  entry: './src/index',
   output: {
     path: path.resolve(__dirname, 'dist'),
+    filename: 'app.bundle.js',
   },
+  devtool: 'source-map',
   devServer: {
     open: true,
     host: 'localhost',
@@ -18,6 +21,7 @@ const config = {
     new HtmlWebpackPlugin({
       template: 'index.html',
     }),
+    new CheckerPlugin(),
 
     // Add your plugins here
     // Learn more about plugins from https://webpack.js.org/configuration/plugins/
@@ -25,9 +29,10 @@ const config = {
   module: {
     rules: [
       {
-        test: /\.(ts|tsx)$/i,
-        loader: 'ts-loader',
-        exclude: ['/node_modules/'],
+        // Include ts, tsx, js, and jsx files.
+        test: /\.(ts|js)x?$/,
+        exclude: /node_modules/,
+        loader: 'babel-loader',
       },
       {
         test: /\.(eot|svg|ttf|woff|woff2|png|jpg|gif)$/i,
@@ -39,7 +44,7 @@ const config = {
     ],
   },
   resolve: {
-    extensions: ['.tsx', '.ts', '.js'],
+    extensions: ['.tsx', '.ts', '.js', 'json'],
   },
 };
 
