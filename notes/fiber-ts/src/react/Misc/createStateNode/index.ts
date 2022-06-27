@@ -1,6 +1,6 @@
 import { createDOMElement } from '../../DOM/index';
 
-const createStateNode = (fiber: any) => {
+const createStateNode = (fiber: { tag: string }) => {
   if (fiber.tag === 'host_component') {
     return createDOMElement(fiber);
   }

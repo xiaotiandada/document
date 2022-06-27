@@ -1,5 +1,10 @@
 import updateNodeElement from './updateNodeElement';
 
+/**
+ * create DOM Element
+ * @param virtualDOM
+ * @returns
+ */
 export default function createDOMElement(virtualDOM: any) {
   let newElement: any = null;
   if (virtualDOM.type === 'text') {

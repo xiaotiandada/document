@@ -32,6 +32,7 @@ const getFirstTask = (): {
 
   /**
    * 返回最外层节点的 fiber 对象
+   * RootFiber
    */
   return {
     props: task.props,
@@ -71,10 +72,21 @@ const reconcileChildren = (fiber: any, children: any[] | object) => {
     };
 
     newFiber.stateNode = createStateNode(newFiber);
+    // console.log(
+    //   'uuuuu',
+    //   newFiber?.props?.title ||
+    //     newFiber?.props?.textContent ||
+    //     newFiber?.props ||
+    //     newFiber
+    // );
 
     if (index === 0) {
       fiber.child = newFiber;
+    } else if (element) {
+      prevFiber.sibling = newFiber;
     }
+
+    prevFiber = newFiber;
 
     index++;
   }
@@ -97,6 +109,10 @@ const executeTask = (fiber: any) => {
       currentExecutelyFiber.parent.effects.concat(
         currentExecutelyFiber.effects.concat([currentExecutelyFiber])
       );
+
+    if (currentExecutelyFiber.sibling) {
+      return currentExecutelyFiber.sibling;
+    }
 
     currentExecutelyFiber = currentExecutelyFiber.parent;
   }
@@ -134,6 +150,13 @@ const workLoop = (deadline: IdleDeadline) => {
    */
   while (subTask && deadline.timeRemaining() > 1) {
     subTask = executeTask(subTask);
+    // console.log(
+    //   'ffff',
+    //   subTask?.props?.title ||
+    //     subTask?.props?.textContent ||
+    //     subTask?.props ||
+    //     subTask
+    // );
   }
 
   if (pendingCommit) {
