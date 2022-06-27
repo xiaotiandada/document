@@ -1,5 +1,6 @@
 /**
  * get tag
+ * 通过 vdom type 判断类型返回 tag
  * @param vdom
  * @returns
  */

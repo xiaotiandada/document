@@ -13,7 +13,7 @@ export default function updateNodeElement(
   }
 
   Object.keys(newProps).forEach((propName) => {
-    console.log('pp', newProps);
+    // console.log('pp', newProps);
     // 获取属性值
     const newPropsValue = newProps[propName];
 

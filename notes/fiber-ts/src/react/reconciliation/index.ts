@@ -16,6 +16,31 @@ const taskQueue = createTaskQueue();
 let subTask: any = null;
 let pendingCommit: any = null;
 
+/**
+ * 提交所有任务
+ * @param fiber
+ */
+const commitAllWork = (fiber: any) => {
+  /**
+   * 循环 effect 数组 构建 DOM 节点树
+   */
+  fiber.effects.forEach((item: any) => {
+    console.log(
+      'effects',
+      item?.props?.title || item?.props?.textContent || item?.props || item
+    );
+
+    if (item.effectTag === 'placement') {
+      let fiber = item;
+      let parentFiber = item.parent;
+
+      if (fiber.tag === 'host_component') {
+        parentFiber.stateNode.appendChild(fiber.stateNode);
+      }
+    }
+  });
+};
+
 const getFirstTask = (): {
   props: any;
   stateNode: any;
@@ -51,19 +76,38 @@ const reconcileChildren = (fiber: any, children: any[] | object) => {
    */
   const arrifiedChildren = arrified(children);
 
+  /**
+   * 循环 children 使用的索引
+   */
   let index = 0;
+  /**
+   * children 数组中元素的个数
+   */
   let numberOfElements = arrifiedChildren.length;
+  /**
+   * 循环过程中的循环项 就是子节点的 virtualDOM 对象
+   */
   let element = null;
+  /**
+   * 子级 fiber 对象
+   */
   let newFiber = null;
+  /**
+   * 上一个兄弟 fiber 对象
+   */
   let prevFiber = null;
 
   while (index < numberOfElements) {
+    /**
+     * 子级 virtualDOM 对象
+     */
     element = arrifiedChildren[index];
 
     // 初始渲染
     newFiber = {
       type: element.type,
       props: element.props,
+      // 获取 Tag
       tag: getTag(element),
       effects: [],
       effectTag: 'placement',
@@ -71,6 +115,7 @@ const reconcileChildren = (fiber: any, children: any[] | object) => {
       parent: fiber,
     };
 
+    // 创建状态节点
     newFiber.stateNode = createStateNode(newFiber);
     // console.log(
     //   'uuuuu',
@@ -98,18 +143,41 @@ const executeTask = (fiber: any) => {
    */
   reconcileChildren(fiber, fiber.props.children);
 
+  /**
+   * 如果子级存在 返回子级
+   * 将这个子级当作父级 构建这个父级下的子级
+   */
   if (fiber.child) {
     return fiber.child;
   }
 
   let currentExecutelyFiber = fiber;
 
+  /**
+   * 父级存在
+   */
   while (currentExecutelyFiber.parent) {
+    /**
+     * 收集 effects
+     */
+    console.log(
+      'currentExecutelyFiber',
+      currentExecutelyFiber?.props?.title ||
+        currentExecutelyFiber?.props?.textContent ||
+        currentExecutelyFiber?.props ||
+        currentExecutelyFiber
+    );
     currentExecutelyFiber.parent.effects =
       currentExecutelyFiber.parent.effects.concat(
         currentExecutelyFiber.effects.concat([currentExecutelyFiber])
       );
 
+    console.log('effect', currentExecutelyFiber.parent.effects);
+
+    /**
+     * 如果兄弟存在 返回兄弟
+     * 将这个兄弟当作父级 构建这个父级下的子级
+     */
     if (currentExecutelyFiber.sibling) {
       return currentExecutelyFiber.sibling;
     }
@@ -120,19 +188,6 @@ const executeTask = (fiber: any) => {
   pendingCommit = currentExecutelyFiber;
 
   console.log('pendingCommit', pendingCommit);
-};
-
-const commitAllWork = (fiber: any) => {
-  fiber.effects.forEach((item: any) => {
-    if (item.effectTag === 'placement') {
-      let fiber = item;
-      let parentFiber = item.parent;
-
-      if (fiber.tag === 'host_component') {
-        parentFiber.stateNode.appendChild(fiber.stateNode);
-      }
-    }
-  });
 };
 
 const workLoop = (deadline: IdleDeadline) => {

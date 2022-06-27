@@ -96,6 +96,290 @@ const tsx = (
 
 ![image-20220627152034495](https://i.imgur.com/fv8xz34.png)
 
+
+
+从下往上收集 fiber
+
+![image-20220627171608241](https://i.imgur.com/tvnG529.png)
+
+![image-20220627165808499](https://i.imgur.com/slyXjju.png)
+
+![image-20220627171645377](https://i.imgur.com/nD8kQby.png)
+
+日志输出父级 effects 数组收集过程
+
+`[parent]: [effects]`
+
+div - 1 - 1:  `[hello]`
+
+div - 1: `[hello, div - 1 - 1]`
+
+div - 1 - 2: `[hello1]`
+
+div - 1: `[hello, div - 1 - 1, hello1, div - 1 - 2]`
+
+div1: `[hello, div - 1 - 1, hello1, div - 1 - 2, div1 - 1]`
+
+wrapper: `[hello, div - 1 - 1, hello1, div - 1 - 2, div1 - 1, div1]`
+
+<br />
+
+div2 - 1: `[world]`
+
+div2: `[world, div2-1]`
+
+div2-2: `[world1]`
+
+div2: ` [world, div2-1, world1, div2 - 2]`
+
+wrapper: `[hello, div - 1 - 1, hello1, div - 1 - 2, div1 - 1, div1, world, div2-1, world1, div2 - 2, div2]`  
+
+<br />
+
+div3: `[fiber]`
+
+wrapper: ` [hello, div - 1 - 1, hello1, div - 1 - 2, div1 - 1, div1, world, div2-1, world1, div2 - 2, div2, fiber, div3]`
+
+<br />
+
+wrapper:  `[hello, div - 1 - 1, hello1, div - 1 - 2, div1 - 1, div1, world, div2-1, world1, div2 - 2, div2, fiber, div3, React]`
+
+<br />
+
+RootFiber: `[hello, div - 1 - 1, hello1, div - 1 - 2, div1 - 1, div1, world, div2-1, world1, div2 - 2, div2, fiber, div3, React, wrapper]`
+
+### fiber 构建节点
+
+```ts
+const workLoop = (deadline: IdleDeadline) => {
+  /**
+   * 如果子任务不存在 就去获取子任务
+   */
+  if (!subTask) {
+    subTask = getFirstTask();
+    console.log('subTask', subTask);
+  }
+
+  /**
+   * 如果任务存在并且浏览器有空余的时间就调用
+   * executeTask 方法执行任务 接受任务 返回新的任务
+   */
+  while (subTask && deadline.timeRemaining() > 1) {
+    subTask = executeTask(subTask);
+  }
+};
+```
+
+```ts
+const executeTask = (fiber: any) => {
+  /**
+   * 构建子级 fiber 对象
+   */
+  reconcileChildren(fiber, fiber.props.children);
+
+  /**
+   * 如果子级存在 返回子级
+   * 将这个子级当作父级 构建这个父级下的子级
+   */
+  if (fiber.child) {
+    return fiber.child;
+  }
+
+  let currentExecutelyFiber = fiber;
+
+  /**
+   * 父级存在
+   */
+  while (currentExecutelyFiber.parent) {
+    /**
+     * 如果兄弟存在 返回兄弟
+     * 将这个兄弟当作父级 构建这个父级下的子级
+     */
+    if (currentExecutelyFiber.sibling) {
+      return currentExecutelyFiber.sibling;
+    }
+
+    currentExecutelyFiber = currentExecutelyFiber.parent;
+  }
+};
+```
+
+```ts
+const reconcileChildren = (fiber: any, children: any[] | object) => {
+  /**
+   * children 可能对象 也可能是数组
+   * 将 children 转换成数组
+   */
+  const arrifiedChildren = arrified(children);
+
+  /**
+   * 循环 children 使用的索引
+   */
+  let index = 0;
+  /**
+   * children 数组中元素的个数
+   */
+  let numberOfElements = arrifiedChildren.length;
+  /**
+   * 循环过程中的循环项 就是子节点的 virtualDOM 对象
+   */
+  let element = null;
+  /**
+   * 子级 fiber 对象
+   */
+  let newFiber = null;
+  /**
+   * 上一个兄弟 fiber 对象
+   */
+  let prevFiber = null;
+
+  while (index < numberOfElements) {
+    /**
+     * 子级 virtualDOM 对象
+     */
+    element = arrifiedChildren[index];
+
+    // 初始渲染
+    newFiber = {
+      type: element.type,
+      props: element.props,
+      // 获取 Tag
+      tag: getTag(element),
+      effects: [],
+      effectTag: 'placement',
+      stateNode: null,
+      parent: fiber,
+    };
+	 
+    // 创建状态节点
+    newFiber.stateNode = createStateNode(newFiber);
+
+    if (index === 0) {
+      fiber.child = newFiber;
+    } else if (element) {
+      prevFiber.sibling = newFiber;
+    }
+
+    prevFiber = newFiber;
+
+    index++;
+  }
+};
+```
+
+```ts
+/**
+ * get tag
+ * 通过 vdom type 判断类型返回 tag
+ * @param vdom
+ * @returns
+ */
+const getTag = (vdom: { type: string }) => {
+  if (typeof vdom.type === 'string') {
+    return 'host_component';
+  }
+};
+
+export default getTag;
+
+```
+
+```ts
+import { createDOMElement } from '../../DOM/index';
+
+/**
+ * 通过 tag 创建不同的节点
+ * @param fiber
+ * @returns
+ */
+const createStateNode = (fiber: { tag: string }) => {
+  if (fiber.tag === 'host_component') {
+    return createDOMElement(fiber);
+  }
+};
+
+export default createStateNode;
+```
+
+```ts
+/**
+ * create DOM Element
+ * 通过 type 类型判断来创建不同的 DOM 元素
+ * @param virtualDOM
+ * @returns
+ */
+export default function createDOMElement(virtualDOM: any) {
+  let newElement: any = null;
+  if (virtualDOM.type === 'text') {
+    newElement = document.createTextNode(virtualDOM.props.textContent);
+  } else {
+    newElement = document.createElement(virtualDOM.type);
+  }
+
+  return newElement;
+}
+```
+
+### fiber 提交任务 构建 DOM 节点树
+
+```ts
+const executeTask = (fiber: any) => {
+	// ...
+
+  /**
+   * 父级存在
+   */
+  while (currentExecutelyFiber.parent) {
+    /**
+     * 收集 effects
+     */
+    currentExecutelyFiber.parent.effects =
+      currentExecutelyFiber.parent.effects.concat(
+        currentExecutelyFiber.effects.concat([currentExecutelyFiber])
+      );
+
+    // ...
+
+    currentExecutelyFiber = currentExecutelyFiber.parent;
+  }
+
+  pendingCommit = currentExecutelyFiber;
+
+  console.log('pendingCommit', pendingCommit);
+};
+```
+
+```ts
+const workLoop = (deadline: IdleDeadline) => {
+  // ...
+  if (pendingCommit) {
+    commitAllWork(pendingCommit);
+  }
+};
+```
+
+```ts
+/**
+ * 提交所有任务
+ * @param fiber
+ */
+const commitAllWork = (fiber: any) => {
+  /**
+   * 循环 effect 数组 构建 DOM 节点树
+   */
+  fiber.effects.forEach((item: any) => {
+    if (item.effectTag === 'placement') {
+      let fiber = item;
+      let parentFiber = item.parent;
+
+      if (fiber.tag === 'host_component') {
+        parentFiber.stateNode.appendChild(fiber.stateNode);
+      }
+    }
+  });
+};
+```
+
 ### fiber 设置节点属性
 
 ```ts
