@@ -31,7 +31,9 @@ console.log('tsx', tsx);
 }
 ```
 
-### fiber
+## fiber
+
+### fiber 树
 
 比如我们有一个类似这样的树节点
 
@@ -99,6 +101,10 @@ const tsx = (
 
 
 从下往上收集 fiber
+
+红色 向上收集链表节点
+
+蓝色 查找兄弟链表节点并向上收集链表节点
 
 ![image-20220627171608241](https://i.imgur.com/tvnG529.png)
 
